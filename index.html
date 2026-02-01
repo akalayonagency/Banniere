@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Akatsuki Frame Editor</title>
+
+  <style>
+    :root{
+      --bg:#050506;
+      --panel: rgba(10,10,12,.72);
+      --stroke: rgba(255,255,255,.08);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.62);
+      --glow: rgba(255,80,0,.22);
+      --glow2: rgba(255,0,0,.16);
+      --btn: rgba(255,110,0,.16);
+      --btn2: rgba(255,110,0,.28);
+    }
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 450px at 50% 20%, var(--glow), transparent 70%),
+        radial-gradient(700px 380px at 50% 90%, var(--glow2), transparent 70%),
+        linear-gradient(180deg, #020203, var(--bg));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .app{
+      width:min(1120px, 100%);
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap:18px;
+    }
+    @media (max-width: 980px){
+      .app{ grid-template-columns:1fr; }
+    }
+
+    .panel{
+      background: var(--panel);
+      border: 1px solid var(--stroke);
+      border-radius: 18px;
+      padding:16px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.03) inset,
+        0 30px 90px rgba(0,0,0,.55);
+      backdrop-filter: blur(10px);
+    }
+    .title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .title h1{
+      font-size:16px;
+      margin:0;
+      letter-spacing:.5px;
+      font-weight:800;
+      text-transform:uppercase;
+    }
+    .badge{
+      font-size:12px;
+      color:var(--muted);
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.28);
+      white-space:nowrap;
+    }
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:12px 0 6px;
+    }
+    select, input[type="file"], input[type="range"]{ width:100%; }
+
+    select{
+      appearance:none;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.35);
+      color:var(--text);
+      outline:none;
+    }
+
+    input[type="file"]{
+      padding:10px;
+      border-radius:12px;
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.35);
+      color:var(--muted);
+      outline:none;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:12px;
+    }
+    .row > *{ flex:1; }
+
+    .btn{
+      cursor:pointer;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,180,120,.18);
+      background: linear-gradient(180deg, var(--btn2), var(--btn));
+      color: var(--text);
+      font-weight:800;
+      letter-spacing:.2px;
+      text-transform:uppercase;
+      transition: transform .06s ease, filter .15s ease;
+      user-select:none;
+    }
+    .btn:hover{ filter:brightness(1.08); }
+    .btn:active{ transform: translateY(1px); }
+
+    .btn.secondary{
+      background: rgba(0,0,0,.35);
+      border:1px solid var(--stroke);
+      color: var(--muted);
+      font-weight:700;
+      text-transform:none;
+    }
+
+    .hint{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+
+    .previewWrap{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .smallbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .kbd{
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.30);
+      border-radius:8px;
+      padding:4px 8px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    .canvasWrap{
+      position:relative;
+      width:100%;
+      aspect-ratio:1/1;
+      border-radius: 18px;
+      overflow:hidden;
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.35);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.03) inset,
+        0 40px 120px rgba(0,0,0,.65);
+    }
+    canvas{
+      width:100%;
+      height:100%;
+      display:block;
+      border-radius: 14px;
+    }
+
+    .errorBox{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,80,80,.25);
+      background: rgba(120,0,0,.16);
+      color: rgba(255,220,220,.95);
+      font-size:12px;
+      display:none;
+      line-height:1.35;
+      white-space:pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <div class="panel">
+      <div class="title">
+        <h1>Akatsuki Frame Editor</h1>
+        <div class="badge">1 fichier • PNG export</div>
+      </div>
+
+      <label for="frameSelect">Choisir un cadre</label>
+      <select id="frameSelect"></select>
+
+      <label for="photoInput">Importer ta photo</label>
+      <input id="photoInput" type="file" accept="image/*" />
+
+      <label for="zoomRange">Zoom</label>
+      <input id="zoomRange" type="range" min="0.6" max="2.2" step="0.01" value="1" />
+
+      <div class="row">
+        <button id="resetBtn" class="btn secondary" type="button">Recentrer</button>
+        <button id="downloadBtn" class="btn" type="button">Télécharger PNG</button>
+      </div>
+
+      <div class="hint">
+        • La photo est calée automatiquement en mode <b>cover</b> dans le cercle.<br/>
+        • Tu peux <b>glisser</b> sur le rendu pour repositionner l’image.<br/>
+        • Les cadres sont au <b>même niveau</b> que <span class="kbd">index.html</span> : <span class="kbd">banniere 1.png</span> etc.
+      </div>
+
+      <div id="errorBox" class="errorBox"></div>
+    </div>
+
+    <div class="previewWrap">
+      <div class="panel">
+        <div class="smallbar">
+          <div>Aperçu (export = rendu)</div>
+          <div><span class="kbd">Drag</span> déplacer • <span class="kbd">Slider</span> zoom</div>
+        </div>
+      </div>
+
+      <div class="canvasWrap panel" style="padding:10px;">
+        <canvas id="preview" width="1024" height="1024"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    "use strict";
+
+    // =========================================================
+    // CONFIG: 8 EXEMPLES (tu renommeras ensuite)
+    // IMPORTANT: les PNG sont dans le même dossier que index.html
+    //
+    // mask: cx, cy, r = cercle intérieur (zone photo)
+    // Pour ton cadre Akatsuki 1024x1024 : centre 512/512, rayon ~388
+    // =========================================================
+    const FRAMES = [
+      { id:"b1", name:"Banniere 1", src:"banniere 1.png", mask:{ cx:512, cy:512, r:388 } },
+      { id:"b2", name:"Banniere 2", src:"banniere 2.png", mask:{ cx:512, cy:512, r:388 } },
+      { id:"b3", name:"Banniere 3", src:"banniere 3.png", mask:{ cx:512, cy:512, r:388 } },
+      { id:"b4", name:"Banniere 4", src:"banniere 4.png", mask:{ cx:512, cy:512, r:388 } },
+      { id:"b5", name:"Banniere 5", src:"banniere 5.png", mask:{ cx:512, cy:512, r:388 } },
+      { id:"b6", name:"Banniere 6", src:"banniere 6.png", mask:{ cx:512, cy:512, r:388 } },
+      { id:"b7", name:"Banniere 7", src:"banniere 7.png", mask:{ cx:512, cy:512, r:388 } },
+      { id:"b8", name:"Banniere 8", src:"banniere 8.png", mask:{ cx:512, cy:512, r:388 } }
+    ];
+
+    // ===== DOM =====
+    const frameSelect = document.getElementById("frameSelect");
+    const photoInput  = document.getElementById("photoInput");
+    const zoomRange   = document.getElementById("zoomRange");
+    const resetBtn    = document.getElementById("resetBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const errorBox    = document.getElementById("errorBox");
+
+    const canvas = document.getElementById("preview");
+    const ctx = canvas.getContext("2d", { alpha: true });
+
+    // ===== STATE =====
+    const state = {
+      frame: null,
+      frameImg: null,
+      userImg: null,
+      zoom: 1,
+      baseCoverScale: 1,
+      offsetX: 0,
+      offsetY: 0,
+      dragging: false,
+      dragStart: { x: 0, y: 0, ox: 0, oy: 0 }
+    };
+
+    // ===== UI errors (pas de crash) =====
+    function showError(msg){
+      errorBox.style.display = "block";
+      errorBox.textContent = msg;
+    }
+    function clearError(){
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+    }
+
+    // ===== Helpers =====
+    function loadImage(src){
+      return new Promise((resolve, reject) => {
+        const im = new Image();
+        im.onload = () => resolve(im);
+        im.onerror = () => reject(new Error("Impossible de charger l'image: " + src));
+        // IMPORTANT: pas de crossOrigin ici (fichiers locaux / github pages => OK)
+        im.src = src;
+      });
+    }
+
+    function loadUserFile(file){
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const im = new Image();
+        im.onload = () => { URL.revokeObjectURL(url); resolve(im); };
+        im.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Fichier image invalide.")); };
+        im.src = url;
+      });
+    }
+
+    function computeCoverScale(imgW, imgH, diameter){
+      return Math.max(diameter / imgW, diameter / imgH);
+    }
+
+    function resetPlacement(){
+      if (!state.frame || !state.userImg) return;
+
+      const m = state.frame.mask;
+      const d = m.r * 2;
+
+      state.baseCoverScale = computeCoverScale(state.userImg.naturalWidth, state.userImg.naturalHeight, d);
+      state.zoom = 1;
+      zoomRange.value = "1";
+      state.offsetX = 0;
+      state.offsetY = 0;
+
+      draw();
+    }
+
+    // ===== Draw =====
+    function draw(){
+      if (!state.frame || !state.frameImg){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        return;
+      }
+
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      // Photo dans le cercle
+      if (state.userImg){
+        const m = state.frame.mask;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(m.cx, m.cy, m.r, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+
+        const s = state.baseCoverScale * state.zoom;
+        const imgW = state.userImg.naturalWidth * s;
+        const imgH = state.userImg.naturalHeight * s;
+
+        const x = (m.cx - imgW/2) + state.offsetX;
+        const y = (m.cy - imgH/2) + state.offsetY;
+
+        ctx.drawImage(state.userImg, x, y, imgW, imgH);
+        ctx.restore();
+      }
+
+      // Cadre par-dessus (exact)
+      ctx.drawImage(state.frameImg, 0, 0, canvas.width, canvas.height);
+    }
+
+    // ===== Export =====
+    function exportPNG(){
+      clearError();
+
+      if (!state.frameImg || !state.frame){
+        showError("Cadre non chargé.");
+        return;
+      }
+      if (!state.userImg){
+        showError("Importe une photo avant de télécharger.");
+        return;
+      }
+
+      // toBlob = fiable + évite les soucis dataURL trop lourd
+      canvas.toBlob((blob) => {
+        if (!blob){
+          showError("Export impossible (toBlob a renvoyé null).");
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = (state.frame.name || "export") + ".png";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, "image/png");
+    }
+
+    // ===== Init frames UI =====
+    function populateFrames(){
+      frameSelect.innerHTML = "";
+      for (const f of FRAMES){
+        const opt = document.createElement("option");
+        opt.value = f.id;
+        opt.textContent = f.name;
+        frameSelect.appendChild(opt);
+      }
+    }
+
+    async function setFrameById(id){
+      clearError();
+
+      const f = FRAMES.find(x => x.id === id) || FRAMES[0];
+      state.frame = f;
+
+      try{
+        const im = await loadImage(f.src);
+        state.frameImg = im;
+
+        // si l'image du cadre n'est pas 1024x1024, on adapte le canvas
+        // (ça évite des rendus flous / mauvaise mise à l'échelle)
+        if (im.naturalWidth > 0 && im.naturalHeight > 0){
+          canvas.width  = im.naturalWidth;
+          canvas.height = im.naturalHeight;
+        }
+
+        // IMPORTANT: si tu changes de taille de canvas,
+        // tes mask cx/cy/r doivent matcher cette résolution.
+        // Ici on suppose du 1024x1024, comme ton modèle.
+        // (Tu peux ajuster mask par bannière si besoin.)
+
+        if (state.userImg) resetPlacement();
+        draw();
+      }catch(err){
+        console.error(err);
+        state.frameImg = null;
+        draw();
+        showError(
+          "Erreur chargement du cadre : " + f.src + "\n" +
+          "Vérifie que le fichier existe au même niveau que index.html.\n" +
+          "Astuce: si tu ouvres en file:// certains navigateurs bloquent les images. Utilise un serveur (ou GitHub Pages)."
+        );
+      }
+    }
+
+    // ===== Events =====
+    frameSelect.addEventListener("change", () => {
+      setFrameById(frameSelect.value);
+    });
+
+    photoInput.addEventListener("change", async (e) => {
+      clearError();
+
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      try{
+        const im = await loadUserFile(file);
+        state.userImg = im;
+        resetPlacement();
+      }catch(err){
+        console.error(err);
+        showError("Impossible de charger cette image utilisateur.");
+      }finally{
+        // Permet de re-sélectionner le même fichier sans bug
+        photoInput.value = "";
+      }
+    });
+
+    zoomRange.addEventListener("input", () => {
+      state.zoom = parseFloat(zoomRange.value) || 1;
+      draw();
+    });
+
+    resetBtn.addEventListener("click", () => resetPlacement());
+    downloadBtn.addEventListener("click", () => exportPNG());
+
+    // Drag souris (reposition)
+    canvas.addEventListener("mousedown", (e) => {
+      if (!state.userImg || !state.frame) return;
+
+      state.dragging = true;
+
+      // offsets en coordonnées canvas
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (e.clientY - rect.top)  * (canvas.height / rect.height);
+
+      state.dragStart.x = x;
+      state.dragStart.y = y;
+      state.dragStart.ox = state.offsetX;
+      state.dragStart.oy = state.offsetY;
+    });
+
+    window.addEventListener("mouseup", () => { state.dragging = false; });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!state.dragging) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (e.clientY - rect.top)  * (canvas.height / rect.height);
+
+      const dx = x - state.dragStart.x;
+      const dy = y - state.dragStart.y;
+
+      state.offsetX = state.dragStart.ox + dx;
+      state.offsetY = state.dragStart.oy + dy;
+
+      draw();
+    });
+
+    // Touch (mobile)
+    canvas.addEventListener("touchstart", (e) => {
+      if (!state.userImg || !state.frame) return;
+      if (e.touches.length !== 1) return;
+      e.preventDefault();
+
+      const rect = canvas.getBoundingClientRect();
+      const t = e.touches[0];
+      const x = (t.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (t.clientY - rect.top)  * (canvas.height / rect.height);
+
+      state.dragging = true;
+      state.dragStart.x = x;
+      state.dragStart.y = y;
+      state.dragStart.ox = state.offsetX;
+      state.dragStart.oy = state.offsetY;
+    }, { passive:false });
+
+    window.addEventListener("touchend", () => { state.dragging = false; });
+
+    window.addEventListener("touchmove", (e) => {
+      if (!state.dragging) return;
+      if (e.touches.length !== 1) return;
+      e.preventDefault();
+
+      const rect = canvas.getBoundingClientRect();
+      const t = e.touches[0];
+      const x = (t.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (t.clientY - rect.top)  * (canvas.height / rect.height);
+
+      const dx = x - state.dragStart.x;
+      const dy = y - state.dragStart.y;
+
+      state.offsetX = state.dragStart.ox + dx;
+      state.offsetY = state.dragStart.oy + dy;
+
+      draw();
+    }, { passive:false });
+
+    // ===== Boot =====
+    (function boot(){
+      populateFrames();
+      // charge le 1er cadre par défaut
+      setFrameById(FRAMES[0].id);
+      draw();
+    })();
+  </script>
+</body>
+</html>
