@@ -204,7 +204,7 @@
     <div class="panel">
       <div class="title">
         <h1>Akatsuki Frame Editor</h1>
-        <div class="badge">1 fichier • PNG export</div>
+        <div class="badge">Fix import • PNG export</div>
       </div>
 
       <label for="frameSelect">Choisir un cadre</label>
@@ -222,9 +222,9 @@
       </div>
 
       <div class="hint">
-        • La photo est calée automatiquement en mode <b>cover</b> dans le cercle.<br/>
-        • Tu peux <b>glisser</b> sur le rendu pour repositionner l’image.<br/>
-        • Les cadres sont au <b>même niveau</b> que <span class="kbd">index.html</span> : <span class="kbd">banniere 1.png</span> etc.
+        • Si ton cadre ne charge pas, tu verras un message d’erreur.<br/>
+        • Même sans cadre, la photo doit s’afficher (ça valide l’import).<br/>
+        • Les fichiers doivent être au même niveau que <span class="kbd">index.html</span>.
       </div>
 
       <div id="errorBox" class="errorBox"></div>
@@ -239,6 +239,7 @@
       </div>
 
       <div class="canvasWrap panel" style="padding:10px;">
+        <!-- On fixe 1024x1024 pour matcher tes cadres -->
         <canvas id="preview" width="1024" height="1024"></canvas>
       </div>
     </div>
@@ -248,25 +249,18 @@
   <script>
     "use strict";
 
-    // =========================================================
-    // CONFIG: 8 EXEMPLES (tu renommeras ensuite)
-    // IMPORTANT: les PNG sont dans le même dossier que index.html
-    //
-    // mask: cx, cy, r = cercle intérieur (zone photo)
-    // Pour ton cadre Akatsuki 1024x1024 : centre 512/512, rayon ~388
-    // =========================================================
+    // 8 exemples (même dossier que index.html)
     const FRAMES = [
-      { id:"b1", name:"TeamDragon", src:"TeamDragon.png", mask:{ cx:512, cy:512, r:388 } },
+       { id:"b1", name:"TeamDragon", src:"TeamDragon.png", mask:{ cx:512, cy:512, r:388 } },
       { id:"b2", name:"TeamLicorne", src:"TeamLicorne.png", mask:{ cx:512, cy:512, r:388 } },
       { id:"b3", name:"Team Diabloss", src:"Team Diabloss.png", mask:{ cx:512, cy:512, r:388 } },
-      { id:"b4", name:"Team Fouuu", src:"Team fouuu.png", mask:{ cx:512, cy:512, r:388 } },
+      { id:"b4", name:"Team Fouuu", src:"Team Fouuu.png", mask:{ cx:512, cy:512, r:388 } },
       { id:"b5", name:"Team The Prince", src:"Team The Prince.png", mask:{ cx:512, cy:512, r:388 } },
       { id:"b6", name:"Team Phoenix", src:"Team Phoenix.png", mask:{ cx:512, cy:512, r:388 } },
       { id:"b7", name:"Banniere 7", src:"banniere 7.png", mask:{ cx:512, cy:512, r:388 } },
       { id:"b8", name:"Banniere 8", src:"banniere 8.png", mask:{ cx:512, cy:512, r:388 } }
     ];
 
-    // ===== DOM =====
     const frameSelect = document.getElementById("frameSelect");
     const photoInput  = document.getElementById("photoInput");
     const zoomRange   = document.getElementById("zoomRange");
@@ -277,7 +271,6 @@
     const canvas = document.getElementById("preview");
     const ctx = canvas.getContext("2d", { alpha: true });
 
-    // ===== STATE =====
     const state = {
       frame: null,
       frameImg: null,
@@ -290,7 +283,6 @@
       dragStart: { x: 0, y: 0, ox: 0, oy: 0 }
     };
 
-    // ===== UI errors (pas de crash) =====
     function showError(msg){
       errorBox.style.display = "block";
       errorBox.textContent = msg;
@@ -300,14 +292,13 @@
       errorBox.textContent = "";
     }
 
-    // ===== Helpers =====
     function loadImage(src){
       return new Promise((resolve, reject) => {
         const im = new Image();
         im.onload = () => resolve(im);
-        im.onerror = () => reject(new Error("Impossible de charger l'image: " + src));
-        // IMPORTANT: pas de crossOrigin ici (fichiers locaux / github pages => OK)
-        im.src = src;
+        im.onerror = () => reject(new Error("Impossible de charger: " + src));
+        // encodeURI => gère mieux les espaces
+        im.src = encodeURI(src);
       });
     }
 
@@ -316,7 +307,7 @@
         const url = URL.createObjectURL(file);
         const im = new Image();
         im.onload = () => { URL.revokeObjectURL(url); resolve(im); };
-        im.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Fichier image invalide.")); };
+        im.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Image utilisateur invalide.")); };
         im.src = url;
       });
     }
@@ -327,7 +318,6 @@
 
     function resetPlacement(){
       if (!state.frame || !state.userImg) return;
-
       const m = state.frame.mask;
       const d = m.r * 2;
 
@@ -336,20 +326,19 @@
       zoomRange.value = "1";
       state.offsetX = 0;
       state.offsetY = 0;
-
       draw();
     }
 
-    // ===== Draw =====
     function draw(){
-      if (!state.frame || !state.frameImg){
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+      // toujours nettoyer
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      // Si pas de frame sélectionnée, on dessine rien
+      if (!state.frame){
         return;
       }
 
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-
-      // Photo dans le cercle
+      // 1) Dessiner la photo (même si le cadre n'est pas chargé)
       if (state.userImg){
         const m = state.frame.mask;
 
@@ -370,24 +359,29 @@
         ctx.restore();
       }
 
-      // Cadre par-dessus (exact)
-      ctx.drawImage(state.frameImg, 0, 0, canvas.width, canvas.height);
+      // 2) Dessiner le cadre si chargé (exact rendu final)
+      if (state.frameImg){
+        ctx.drawImage(state.frameImg, 0, 0, canvas.width, canvas.height);
+      } else {
+        // Petit indicateur discret si le cadre manque
+        ctx.save();
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = "rgba(0,0,0,0.35)";
+        ctx.fillRect(18, 18, 420, 56);
+        ctx.fillStyle = "rgba(255,220,220,0.95)";
+        ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+        ctx.fillText("Cadre non chargé (vérifie le nom/chemin du PNG)", 30, 52);
+        ctx.restore();
+      }
     }
 
-    // ===== Export =====
     function exportPNG(){
       clearError();
-
-      if (!state.frameImg || !state.frame){
-        showError("Cadre non chargé.");
-        return;
-      }
       if (!state.userImg){
         showError("Importe une photo avant de télécharger.");
         return;
       }
-
-      // toBlob = fiable + évite les soucis dataURL trop lourd
+      // Si cadre pas chargé, on exporte quand même (utile pour debug)
       canvas.toBlob((blob) => {
         if (!blob){
           showError("Export impossible (toBlob a renvoyé null).");
@@ -396,7 +390,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = (state.frame.name || "export") + ".png";
+        a.download = (state.frame?.name || "export") + ".png";
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -404,7 +398,6 @@
       }, "image/png");
     }
 
-    // ===== Init frames UI =====
     function populateFrames(){
       frameSelect.innerHTML = "";
       for (const f of FRAMES){
@@ -420,23 +413,14 @@
 
       const f = FRAMES.find(x => x.id === id) || FRAMES[0];
       state.frame = f;
+      state.frameImg = null; // reset
 
       try{
-        const im = await loadImage(f.src);
-        state.frameImg = im;
+        console.log("[Frame] chargement:", f.src);
+        state.frameImg = await loadImage(f.src);
+        console.log("[Frame] OK:", f.src);
 
-        // si l'image du cadre n'est pas 1024x1024, on adapte le canvas
-        // (ça évite des rendus flous / mauvaise mise à l'échelle)
-        if (im.naturalWidth > 0 && im.naturalHeight > 0){
-          canvas.width  = im.naturalWidth;
-          canvas.height = im.naturalHeight;
-        }
-
-        // IMPORTANT: si tu changes de taille de canvas,
-        // tes mask cx/cy/r doivent matcher cette résolution.
-        // Ici on suppose du 1024x1024, comme ton modèle.
-        // (Tu peux ajuster mask par bannière si besoin.)
-
+        // si une photo est déjà là, recalculer le fit
         if (state.userImg) resetPlacement();
         draw();
       }catch(err){
@@ -445,32 +429,31 @@
         draw();
         showError(
           "Erreur chargement du cadre : " + f.src + "\n" +
-          "Vérifie que le fichier existe au même niveau que index.html.\n" +
-          "Astuce: si tu ouvres en file:// certains navigateurs bloquent les images. Utilise un serveur (ou GitHub Pages)."
+          "1) Vérifie que le fichier existe au même niveau que index.html\n" +
+          "2) Vérifie la casse (banniere 1.png ≠ Banniere 1.png)\n" +
+          "3) Si tu es en file://, teste via un hébergement (GitHub Pages) ou un petit serveur local."
         );
       }
     }
 
-    // ===== Events =====
-    frameSelect.addEventListener("change", () => {
-      setFrameById(frameSelect.value);
-    });
+    // Events
+    frameSelect.addEventListener("change", () => setFrameById(frameSelect.value));
 
     photoInput.addEventListener("change", async (e) => {
       clearError();
-
       const file = e.target.files && e.target.files[0];
       if (!file) return;
 
       try{
-        const im = await loadUserFile(file);
-        state.userImg = im;
-        resetPlacement();
+        console.log("[UserPhoto] chargement:", file.name, file.type, file.size);
+        state.userImg = await loadUserFile(file);
+        console.log("[UserPhoto] OK:", state.userImg.naturalWidth, "x", state.userImg.naturalHeight);
+        resetPlacement(); // calcule cover scale + draw
       }catch(err){
         console.error(err);
         showError("Impossible de charger cette image utilisateur.");
       }finally{
-        // Permet de re-sélectionner le même fichier sans bug
+        // permet de re-sélectionner le même fichier
         photoInput.value = "";
       }
     });
@@ -483,13 +466,11 @@
     resetBtn.addEventListener("click", () => resetPlacement());
     downloadBtn.addEventListener("click", () => exportPNG());
 
-    // Drag souris (reposition)
+    // Drag souris
     canvas.addEventListener("mousedown", (e) => {
       if (!state.userImg || !state.frame) return;
-
       state.dragging = true;
 
-      // offsets en coordonnées canvas
       const rect = canvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) * (canvas.width / rect.width);
       const y = (e.clientY - rect.top)  * (canvas.height / rect.height);
@@ -509,16 +490,12 @@
       const x = (e.clientX - rect.left) * (canvas.width / rect.width);
       const y = (e.clientY - rect.top)  * (canvas.height / rect.height);
 
-      const dx = x - state.dragStart.x;
-      const dy = y - state.dragStart.y;
-
-      state.offsetX = state.dragStart.ox + dx;
-      state.offsetY = state.dragStart.oy + dy;
-
+      state.offsetX = state.dragStart.ox + (x - state.dragStart.x);
+      state.offsetY = state.dragStart.oy + (y - state.dragStart.y);
       draw();
     });
 
-    // Touch (mobile)
+    // Touch
     canvas.addEventListener("touchstart", (e) => {
       if (!state.userImg || !state.frame) return;
       if (e.touches.length !== 1) return;
@@ -548,19 +525,14 @@
       const x = (t.clientX - rect.left) * (canvas.width / rect.width);
       const y = (t.clientY - rect.top)  * (canvas.height / rect.height);
 
-      const dx = x - state.dragStart.x;
-      const dy = y - state.dragStart.y;
-
-      state.offsetX = state.dragStart.ox + dx;
-      state.offsetY = state.dragStart.oy + dy;
-
+      state.offsetX = state.dragStart.ox + (x - state.dragStart.x);
+      state.offsetY = state.dragStart.oy + (y - state.dragStart.y);
       draw();
     }, { passive:false });
 
-    // ===== Boot =====
+    // Boot
     (function boot(){
       populateFrames();
-      // charge le 1er cadre par défaut
       setFrameById(FRAMES[0].id);
       draw();
     })();
