@@ -32,6 +32,7 @@
       justify-content:center;
       padding:24px;
     }
+
     .app{
       width:min(1120px, 100%);
       display:grid;
@@ -52,6 +53,7 @@
         0 30px 90px rgba(0,0,0,.55);
       backdrop-filter: blur(10px);
     }
+
     .title{
       display:flex;
       align-items:center;
@@ -75,6 +77,7 @@
       background: rgba(0,0,0,.28);
       white-space:nowrap;
     }
+
     label{
       display:block;
       font-size:12px;
@@ -141,29 +144,6 @@
       line-height:1.35;
     }
 
-    .previewWrap{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    .smallbar{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:space-between;
-      align-items:center;
-      color:var(--muted);
-      font-size:12px;
-    }
-    .kbd{
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.30);
-      border-radius:8px;
-      padding:4px 8px;
-      color:var(--muted);
-      white-space:nowrap;
-    }
-
     .canvasWrap{
       position:relative;
       width:100%;
@@ -176,6 +156,7 @@
         0 0 0 1px rgba(255,255,255,.03) inset,
         0 40px 120px rgba(0,0,0,.65);
     }
+
     canvas{
       width:100%;
       height:100%;
@@ -204,7 +185,7 @@
     <div class="panel">
       <div class="title">
         <h1>Akatsuki Frame Editor</h1>
-        <div class="badge">Fix import • PNG export</div>
+        <div class="badge">PNG export</div>
       </div>
 
       <label for="frameSelect">Choisir un cadre</label>
@@ -222,26 +203,15 @@
       </div>
 
       <div class="hint">
-        • Si ton cadre ne charge pas, tu verras un message d’erreur.<br/>
-        • Même sans cadre, la photo doit s’afficher (ça valide l’import).<br/>
-        • Les fichiers doivent être au même niveau que <span class="kbd">index.html</span>.
+        • La photo est calée automatiquement en mode <b>cover</b> dans le cercle.<br/>
+        • Les cadres doivent être au même niveau que <b>index.html</b> (ex: <b>banniere 1.png</b>).
       </div>
 
       <div id="errorBox" class="errorBox"></div>
     </div>
 
-    <div class="previewWrap">
-      <div class="panel">
-        <div class="smallbar">
-          <div>Aperçu (export = rendu)</div>
-          <div><span class="kbd">Drag</span> déplacer • <span class="kbd">Slider</span> zoom</div>
-        </div>
-      </div>
-
-      <div class="canvasWrap panel" style="padding:10px;">
-        <!-- On fixe 1024x1024 pour matcher tes cadres -->
-        <canvas id="preview" width="1024" height="1024"></canvas>
-      </div>
+    <div class="panel canvasWrap" style="padding:10px;">
+      <canvas id="preview" width="1024" height="1024"></canvas>
     </div>
 
   </div>
@@ -251,10 +221,10 @@
 
     // 8 exemples (même dossier que index.html)
     const FRAMES = [
-       { id:"b1", name:"TeamDragon", src:"TeamDragon.png", mask:{ cx:512, cy:512, r:388 } },
+     { id:"b1", name:"TeamDragon", src:"TeamDragon.png", mask:{ cx:512, cy:512, r:388 } },
       { id:"b2", name:"TeamLicorne", src:"TeamLicorne.png", mask:{ cx:512, cy:512, r:388 } },
       { id:"b3", name:"Team Diabloss", src:"Team Diabloss.png", mask:{ cx:512, cy:512, r:388 } },
-      { id:"b4", name:"Team Fouuu", src:"Team Fouuu.png", mask:{ cx:512, cy:512, r:388 } },
+      { id:"b4", name:"Team Fouuu", src:"Team fouuu.png", mask:{ cx:512, cy:512, r:388 } },
       { id:"b5", name:"Team The Prince", src:"Team The Prince.png", mask:{ cx:512, cy:512, r:388 } },
       { id:"b6", name:"Team Phoenix", src:"Team Phoenix.png", mask:{ cx:512, cy:512, r:388 } },
       { id:"b7", name:"Banniere 7", src:"banniere 7.png", mask:{ cx:512, cy:512, r:388 } },
@@ -302,13 +272,20 @@
       });
     }
 
+    // ✅ Correction: FileReader (plus fiable que createObjectURL selon navigateurs)
     function loadUserFile(file){
       return new Promise((resolve, reject) => {
-        const url = URL.createObjectURL(file);
-        const im = new Image();
-        im.onload = () => { URL.revokeObjectURL(url); resolve(im); };
-        im.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Image utilisateur invalide.")); };
-        im.src = url;
+        const reader = new FileReader();
+
+        reader.onerror = () => reject(new Error("Lecture fichier impossible."));
+        reader.onload = () => {
+          const im = new Image();
+          im.onload = () => resolve(im);
+          im.onerror = () => reject(new Error("Image utilisateur invalide."));
+          im.src = String(reader.result);
+        };
+
+        reader.readAsDataURL(file);
       });
     }
 
@@ -318,6 +295,7 @@
 
     function resetPlacement(){
       if (!state.frame || !state.userImg) return;
+
       const m = state.frame.mask;
       const d = m.r * 2;
 
@@ -326,19 +304,16 @@
       zoomRange.value = "1";
       state.offsetX = 0;
       state.offsetY = 0;
+
       draw();
     }
 
     function draw(){
-      // toujours nettoyer
       ctx.clearRect(0,0,canvas.width,canvas.height);
 
-      // Si pas de frame sélectionnée, on dessine rien
-      if (!state.frame){
-        return;
-      }
+      if (!state.frame) return;
 
-      // 1) Dessiner la photo (même si le cadre n'est pas chargé)
+      // 1) Photo dans le cercle
       if (state.userImg){
         const m = state.frame.mask;
 
@@ -359,19 +334,9 @@
         ctx.restore();
       }
 
-      // 2) Dessiner le cadre si chargé (exact rendu final)
+      // 2) Cadre par-dessus
       if (state.frameImg){
         ctx.drawImage(state.frameImg, 0, 0, canvas.width, canvas.height);
-      } else {
-        // Petit indicateur discret si le cadre manque
-        ctx.save();
-        ctx.globalAlpha = 0.9;
-        ctx.fillStyle = "rgba(0,0,0,0.35)";
-        ctx.fillRect(18, 18, 420, 56);
-        ctx.fillStyle = "rgba(255,220,220,0.95)";
-        ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
-        ctx.fillText("Cadre non chargé (vérifie le nom/chemin du PNG)", 30, 52);
-        ctx.restore();
       }
     }
 
@@ -381,7 +346,7 @@
         showError("Importe une photo avant de télécharger.");
         return;
       }
-      // Si cadre pas chargé, on exporte quand même (utile pour debug)
+
       canvas.toBlob((blob) => {
         if (!blob){
           showError("Export impossible (toBlob a renvoyé null).");
@@ -413,14 +378,17 @@
 
       const f = FRAMES.find(x => x.id === id) || FRAMES[0];
       state.frame = f;
-      state.frameImg = null; // reset
+      state.frameImg = null;
 
       try{
-        console.log("[Frame] chargement:", f.src);
         state.frameImg = await loadImage(f.src);
-        console.log("[Frame] OK:", f.src);
 
-        // si une photo est déjà là, recalculer le fit
+        // Option: si le cadre n'est pas 1024, adapte le canvas
+        if (state.frameImg.naturalWidth && state.frameImg.naturalHeight){
+          canvas.width = state.frameImg.naturalWidth;
+          canvas.height = state.frameImg.naturalHeight;
+        }
+
         if (state.userImg) resetPlacement();
         draw();
       }catch(err){
@@ -429,9 +397,8 @@
         draw();
         showError(
           "Erreur chargement du cadre : " + f.src + "\n" +
-          "1) Vérifie que le fichier existe au même niveau que index.html\n" +
-          "2) Vérifie la casse (banniere 1.png ≠ Banniere 1.png)\n" +
-          "3) Si tu es en file://, teste via un hébergement (GitHub Pages) ou un petit serveur local."
+          "Vérifie le nom exact (casse/espaces) et qu'il est au même niveau que index.html.\n" +
+          "Astuce: si tu ouvres en file://, préfère un hébergement (GitHub Pages) ou un serveur local."
         );
       }
     }
@@ -441,19 +408,17 @@
 
     photoInput.addEventListener("change", async (e) => {
       clearError();
+
       const file = e.target.files && e.target.files[0];
       if (!file) return;
 
       try{
-        console.log("[UserPhoto] chargement:", file.name, file.type, file.size);
         state.userImg = await loadUserFile(file);
-        console.log("[UserPhoto] OK:", state.userImg.naturalWidth, "x", state.userImg.naturalHeight);
-        resetPlacement(); // calcule cover scale + draw
+        resetPlacement(); // calcule cover + draw
       }catch(err){
         console.error(err);
         showError("Impossible de charger cette image utilisateur.");
       }finally{
-        // permet de re-sélectionner le même fichier
         photoInput.value = "";
       }
     });
@@ -466,11 +431,11 @@
     resetBtn.addEventListener("click", () => resetPlacement());
     downloadBtn.addEventListener("click", () => exportPNG());
 
-    // Drag souris
+    // Drag souris (reposition)
     canvas.addEventListener("mousedown", (e) => {
       if (!state.userImg || !state.frame) return;
-      state.dragging = true;
 
+      state.dragging = true;
       const rect = canvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) * (canvas.width / rect.width);
       const y = (e.clientY - rect.top)  * (canvas.height / rect.height);
@@ -495,7 +460,7 @@
       draw();
     });
 
-    // Touch
+    // Touch (mobile)
     canvas.addEventListener("touchstart", (e) => {
       if (!state.userImg || !state.frame) return;
       if (e.touches.length !== 1) return;
