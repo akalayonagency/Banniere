@@ -19,14 +19,13 @@
     }
     *{ box-sizing:border-box; }
     html, body{ height:100%; }
+
+    /* ✅ Fond page transparent pour intégration */
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--text);
-      background:
-        radial-gradient(900px 450px at 50% 20%, var(--glow), transparent 70%),
-        radial-gradient(700px 380px at 50% 90%, var(--glow2), transparent 70%),
-        linear-gradient(180deg, #020203, var(--bg));
+      background: transparent; /* important */
       display:flex;
       align-items:center;
       justify-content:center;
@@ -43,15 +42,17 @@
       .app{ grid-template-columns:1fr; }
     }
 
+    /* ✅ Petit effet glass sur les 2 blocs */
     .panel{
-      background: var(--panel);
-      border: 1px solid var(--stroke);
+      background: rgba(20,20,24,0.45);
+      border: 1px solid rgba(255,255,255,0.18);
       border-radius: 18px;
       padding:16px;
       box-shadow:
-        0 0 0 1px rgba(255,255,255,.03) inset,
-        0 30px 90px rgba(0,0,0,.55);
-      backdrop-filter: blur(10px);
+        0 0 0 1px rgba(255,255,255,.04) inset,
+        0 30px 90px rgba(0,0,0,.45);
+      backdrop-filter: blur(18px) saturate(130%);
+      -webkit-backdrop-filter: blur(18px) saturate(130%);
     }
 
     .title{
@@ -73,9 +74,11 @@
       color:var(--muted);
       padding:6px 10px;
       border-radius:999px;
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,.20);
       white-space:nowrap;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     label{
@@ -90,19 +93,23 @@
       appearance:none;
       padding:12px 12px;
       border-radius:12px;
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.25);
       color:var(--text);
       outline:none;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     input[type="file"]{
       padding:10px;
       border-radius:12px;
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.25);
       color:var(--muted);
       outline:none;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .row{
@@ -130,11 +137,13 @@
     .btn:active{ transform: translateY(1px); }
 
     .btn.secondary{
-      background: rgba(0,0,0,.35);
-      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.12);
       color: var(--muted);
       font-weight:700;
       text-transform:none;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .hint{
@@ -144,17 +153,20 @@
       line-height:1.35;
     }
 
+    /* ✅ Canvas bloc aussi en glass */
     .canvasWrap{
       position:relative;
       width:100%;
       aspect-ratio:1/1;
       border-radius: 18px;
       overflow:hidden;
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,0.18);
+      background: rgba(15,15,18,0.35);
       box-shadow:
-        0 0 0 1px rgba(255,255,255,.03) inset,
-        0 40px 120px rgba(0,0,0,.65);
+        0 0 0 1px rgba(255,255,255,.04) inset,
+        0 40px 120px rgba(0,0,0,.55);
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
     }
 
     canvas{
@@ -175,6 +187,8 @@
       display:none;
       line-height:1.35;
       white-space:pre-wrap;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
   </style>
 </head>
