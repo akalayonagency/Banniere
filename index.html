@@ -7,20 +7,14 @@
 
   <style>
     :root {
-      --text: rgba(255, 255, 255, 0.92);
-      --muted: rgba(255, 255, 255, 0.62);
-      --btn: rgba(255, 110, 0, 0.16);
-      --btn2: rgba(255, 110, 0, 0.28);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.62);
+      --btn: rgba(255,110,0,.16);
+      --btn2: rgba(255,110,0,.28);
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      height: 100%;
-    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
 
     body {
       margin: 0;
@@ -41,19 +35,17 @@
     }
 
     @media (max-width: 980px) {
-      .app {
-        grid-template-columns: 1fr;
-      }
+      .app { grid-template-columns: 1fr; }
     }
 
     .panel {
-      background: rgba(20, 20, 24, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(20,20,24,.45);
+      border: 1px solid rgba(255,255,255,.18);
       border-radius: 18px;
       padding: 16px;
       box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-        0 30px 90px rgba(0, 0, 0, 0.45);
+        0 0 0 1px rgba(255,255,255,.04) inset,
+        0 30px 90px rgba(0,0,0,.45);
       backdrop-filter: blur(18px) saturate(130%);
       -webkit-backdrop-filter: blur(18px) saturate(130%);
     }
@@ -69,7 +61,7 @@
     .title h1 {
       font-size: 16px;
       margin: 0;
-      letter-spacing: 0.5px;
+      letter-spacing: .5px;
       font-weight: 800;
       text-transform: uppercase;
     }
@@ -79,11 +71,9 @@
       color: var(--muted);
       padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.2);
       white-space: nowrap;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
     }
 
     label {
@@ -103,12 +93,10 @@
     input[type="file"] {
       padding: 12px;
       border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.25);
       color: var(--text);
       outline: none;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
     }
 
     .row {
@@ -118,35 +106,28 @@
       margin-top: 12px;
     }
 
-    .row > * {
-      flex: 1;
-    }
+    .row > * { flex: 1; }
 
     .btn {
       cursor: pointer;
       padding: 12px;
       border-radius: 12px;
-      border: 1px solid rgba(255, 180, 120, 0.18);
+      border: 1px solid rgba(255,180,120,.18);
       background: linear-gradient(180deg, var(--btn2), var(--btn));
       color: var(--text);
       font-weight: 800;
-      letter-spacing: 0.2px;
+      letter-spacing: .2px;
       text-transform: uppercase;
-      transition: transform 0.06s ease, filter 0.15s ease;
+      transition: transform .06s ease, filter .15s ease;
       user-select: none;
     }
 
-    .btn:hover {
-      filter: brightness(1.08);
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-    }
+    .btn:hover { filter: brightness(1.08); }
+    .btn:active { transform: translateY(1px); }
 
     .btn.secondary {
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.12);
       color: var(--muted);
       font-weight: 700;
       text-transform: none;
@@ -158,13 +139,11 @@
       aspect-ratio: 1 / 1;
       border-radius: 18px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      background: rgba(15, 15, 18, 0.35);
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(15,15,18,.35);
       box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-        0 40px 120px rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(22px) saturate(140%);
-      -webkit-backdrop-filter: blur(22px) saturate(140%);
+        0 0 0 1px rgba(255,255,255,.04) inset,
+        0 40px 120px rgba(0,0,0,.55);
     }
 
     canvas {
@@ -178,9 +157,9 @@
       margin-top: 12px;
       padding: 10px 12px;
       border-radius: 12px;
-      border: 1px solid rgba(255, 80, 80, 0.25);
-      background: rgba(120, 0, 0, 0.16);
-      color: rgba(255, 220, 220, 0.95);
+      border: 1px solid rgba(255,80,80,.25);
+      background: rgba(120,0,0,.16);
+      color: rgba(255,220,220,.95);
       font-size: 12px;
       display: none;
       line-height: 1.35;
@@ -191,19 +170,20 @@
       margin-top: 12px;
       padding: 12px;
       border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
       font-size: 12px;
       color: var(--muted);
       line-height: 1.5;
     }
 
-    .hint strong {
-      color: var(--text);
+    code {
+      background: rgba(255,255,255,.06);
+      padding: 1px 5px;
+      border-radius: 6px;
     }
   </style>
 </head>
-
 <body>
   <div class="app">
     <div class="panel">
@@ -219,7 +199,7 @@
       <input id="photoInput" type="file" accept="image/*" />
 
       <label for="zoomRange">Zoom</label>
-      <input id="zoomRange" type="range" min="0.8" max="2.5" step="0.01" value="1" />
+      <input id="zoomRange" type="range" min="0.8" max="3" step="0.01" value="1" />
 
       <div class="row">
         <button id="resetBtn" class="btn secondary" type="button">Recentrer</button>
@@ -227,14 +207,13 @@
       </div>
 
       <div class="hint">
-        <strong>Réglage équipe par équipe :</strong><br>
-        Modifie <code>cx</code>, <code>cy</code>, <code>r</code> et <code>fitScale</code> dans le tableau <code>FRAMES</code> si un cadre ne remplit pas parfaitement le rond.
+        Les valeurs <code>cx</code>, <code>cy</code>, <code>r</code> sont définies sur une base <code>1024</code> puis redimensionnées automatiquement selon la vraie taille du PNG.
       </div>
 
       <div id="errorBox" class="errorBox"></div>
     </div>
 
-    <div class="panel canvasWrap" style="padding: 10px;">
+    <div class="panel canvasWrap" style="padding:10px;">
       <canvas id="preview" width="1024" height="1024"></canvas>
     </div>
   </div>
@@ -243,18 +222,19 @@
     "use strict";
 
     /*
-      IMPORTANT :
-      - cx / cy / r = position réelle du rond à l'intérieur du PNG
-      - fitScale = petit multiplicateur propre à l'équipe
-      - si un cadre laisse une bordure vide, augmente fitScale
-      - si la photo est trop zoomée, baisse fitScale
-    */
+      Tous les masques ci-dessous sont définis en base 1024x1024.
+      Le code les adapte ensuite automatiquement à la vraie taille du PNG.
 
+      fitScale :
+      - 1.00 = normal
+      - 1.08 / 1.12 / 1.15 = force un remplissage plus fort du rond
+    */
     const FRAMES = [
       {
         id: "b1",
         name: "Team Dragon",
         src: "TeamDragon.png",
+        baseSize: 1024,
         mask: { cx: 512, cy: 512, r: 388 },
         fitScale: 1.00
       },
@@ -262,13 +242,15 @@
         id: "b2",
         name: "L'ombre de l'élite",
         src: "L'ombre de l'élite.png",
+        baseSize: 1024,
         mask: { cx: 512, cy: 512, r: 388 },
-        fitScale: 1.08
+        fitScale: 1.12
       },
       {
         id: "b3",
         name: "Team Diabloss",
         src: "Team Diabloss.png",
+        baseSize: 1024,
         mask: { cx: 512, cy: 512, r: 388 },
         fitScale: 1.00
       },
@@ -276,6 +258,7 @@
         id: "b4",
         name: "Team Fouuu",
         src: "Team Fouuu.png",
+        baseSize: 1024,
         mask: { cx: 512, cy: 512, r: 388 },
         fitScale: 1.00
       },
@@ -283,6 +266,7 @@
         id: "b5",
         name: "Team Licorne",
         src: "TeamLicorne.png",
+        baseSize: 1024,
         mask: { cx: 512, cy: 512, r: 388 },
         fitScale: 1.00
       },
@@ -290,6 +274,7 @@
         id: "b6",
         name: "Team Phoenix",
         src: "Team Phoenix.png",
+        baseSize: 1024,
         mask: { cx: 512, cy: 512, r: 388 },
         fitScale: 1.00
       },
@@ -297,29 +282,33 @@
         id: "b7",
         name: "Team Panther",
         src: "team panther.png",
+        baseSize: 1024,
         mask: { cx: 512, cy: 512, r: 388 },
-        fitScale: 1.10
+        fitScale: 1.14
       },
       {
         id: "b8",
         name: "Team Apéro",
         src: "team apéro.png",
+        baseSize: 1024,
         mask: { cx: 512, cy: 512, r: 388 },
-        fitScale: 1.10
+        fitScale: 1.14
       },
       {
         id: "b9",
         name: "Team Gorille",
         src: "team gorille.png",
+        baseSize: 1024,
         mask: { cx: 512, cy: 512, r: 388 },
-        fitScale: 1.10
+        fitScale: 1.14
       },
       {
         id: "b10",
         name: "Team Loup",
         src: "team loup.png",
+        baseSize: 1024,
         mask: { cx: 512, cy: 512, r: 388 },
-        fitScale: 1.10
+        fitScale: 1.14
       }
     ];
 
@@ -380,22 +369,36 @@
       });
     }
 
-    function computeCoverScale(imgW, imgH, diameter) {
-      return Math.max(diameter / imgW, diameter / imgH);
+    function computeCoverScale(imgW, imgH, targetW, targetH) {
+      return Math.max(targetW / imgW, targetH / imgH);
+    }
+
+    function getScaledMask(frame, frameImg) {
+      const base = frame.baseSize || 1024;
+      const scaleX = frameImg.naturalWidth / base;
+      const scaleY = frameImg.naturalHeight / base;
+
+      return {
+        cx: frame.mask.cx * scaleX,
+        cy: frame.mask.cy * scaleY,
+        r: frame.mask.r * Math.min(scaleX, scaleY)
+      };
     }
 
     function resetPlacement() {
-      if (!state.frame || !state.userImg) return;
+      if (!state.frame || !state.userImg || !state.frameImg) return;
 
-      const { r } = state.frame.mask;
-      const diameter = r * 2;
+      const mask = getScaledMask(state.frame, state.frameImg);
+      const diameter = mask.r * 2;
+      const fitScale = state.frame.fitScale || 1;
 
       state.baseCoverScale =
         computeCoverScale(
           state.userImg.naturalWidth,
           state.userImg.naturalHeight,
+          diameter,
           diameter
-        ) * (state.frame.fitScale || 1);
+        ) * fitScale;
 
       state.zoom = 1;
       state.offsetX = 0;
@@ -405,40 +408,32 @@
       draw();
     }
 
-    function drawPhotoInsideCircle() {
-      if (!state.frame || !state.userImg) return;
-
-      const { cx, cy, r } = state.frame.mask;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.closePath();
-      ctx.clip();
-
-      const scale = state.baseCoverScale * state.zoom;
-      const drawW = state.userImg.naturalWidth * scale;
-      const drawH = state.userImg.naturalHeight * scale;
-
-      const x = cx - (drawW / 2) + state.offsetX;
-      const y = cy - (drawH / 2) + state.offsetY;
-
-      ctx.drawImage(state.userImg, x, y, drawW, drawH);
-      ctx.restore();
-    }
-
-    function drawFrame() {
-      if (!state.frameImg) return;
-      ctx.drawImage(state.frameImg, 0, 0, canvas.width, canvas.height);
-    }
-
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (!state.frame) return;
+      if (!state.frame || !state.frameImg) return;
 
-      drawPhotoInsideCircle();
-      drawFrame();
+      const mask = getScaledMask(state.frame, state.frameImg);
+
+      if (state.userImg) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(mask.cx, mask.cy, mask.r, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+
+        const scale = state.baseCoverScale * state.zoom;
+        const drawW = state.userImg.naturalWidth * scale;
+        const drawH = state.userImg.naturalHeight * scale;
+
+        const x = mask.cx - drawW / 2 + state.offsetX;
+        const y = mask.cy - drawH / 2 + state.offsetY;
+
+        ctx.drawImage(state.userImg, x, y, drawW, drawH);
+        ctx.restore();
+      }
+
+      ctx.drawImage(state.frameImg, 0, 0, canvas.width, canvas.height);
     }
 
     function exportPNG() {
@@ -480,7 +475,7 @@
     async function setFrameById(frameId) {
       clearError();
 
-      const frame = FRAMES.find((item) => item.id === frameId) || FRAMES[0];
+      const frame = FRAMES.find(f => f.id === frameId) || FRAMES[0];
       state.frame = frame;
       state.frameImg = null;
 
@@ -488,10 +483,8 @@
         const img = await loadImage(frame.src);
         state.frameImg = img;
 
-        if (img.naturalWidth && img.naturalHeight) {
-          canvas.width = img.naturalWidth;
-          canvas.height = img.naturalHeight;
-        }
+        canvas.width = img.naturalWidth || 1024;
+        canvas.height = img.naturalHeight || 1024;
 
         if (state.userImg) {
           resetPlacement();
@@ -509,7 +502,6 @@
 
     function getCanvasPoint(clientX, clientY) {
       const rect = canvas.getBoundingClientRect();
-
       return {
         x: (clientX - rect.left) * (canvas.width / rect.width),
         y: (clientY - rect.top) * (canvas.height / rect.height)
@@ -517,8 +509,7 @@
     }
 
     function startDrag(x, y) {
-      if (!state.userImg || !state.frame) return;
-
+      if (!state.userImg) return;
       state.dragging = true;
       state.dragStart.x = x;
       state.dragStart.y = y;
@@ -528,7 +519,6 @@
 
     function moveDrag(x, y) {
       if (!state.dragging) return;
-
       state.offsetX = state.dragStart.ox + (x - state.dragStart.x);
       state.offsetY = state.dragStart.oy + (y - state.dragStart.y);
       draw();
@@ -544,7 +534,6 @@
 
     photoInput.addEventListener("change", async (event) => {
       clearError();
-
       const file = event.target.files?.[0];
       if (!file) return;
 
@@ -587,18 +576,16 @@
     canvas.addEventListener("touchstart", (event) => {
       if (event.touches.length !== 1) return;
       event.preventDefault();
-
-      const touch = event.touches[0];
-      const p = getCanvasPoint(touch.clientX, touch.clientY);
+      const t = event.touches[0];
+      const p = getCanvasPoint(t.clientX, t.clientY);
       startDrag(p.x, p.y);
     }, { passive: false });
 
     window.addEventListener("touchmove", (event) => {
       if (!state.dragging || event.touches.length !== 1) return;
       event.preventDefault();
-
-      const touch = event.touches[0];
-      const p = getCanvasPoint(touch.clientX, touch.clientY);
+      const t = event.touches[0];
+      const p = getCanvasPoint(t.clientX, t.clientY);
       moveDrag(p.x, p.y);
     }, { passive: false });
 
