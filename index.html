@@ -7,13 +7,8 @@
 
   <style>
     :root {
-      --bg: #050506;
-      --panel: rgba(10, 10, 12, 0.72);
-      --stroke: rgba(255, 255, 255, 0.08);
       --text: rgba(255, 255, 255, 0.92);
       --muted: rgba(255, 255, 255, 0.62);
-      --glow: rgba(255, 80, 0, 0.22);
-      --glow2: rgba(255, 0, 0, 0.16);
       --btn: rgba(255, 110, 0, 0.16);
       --btn2: rgba(255, 110, 0, 0.28);
     }
@@ -27,7 +22,6 @@
       height: 100%;
     }
 
-    /* Fond page transparent pour intégration */
     body {
       margin: 0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -52,7 +46,6 @@
       }
     }
 
-    /* Petit effet glass sur les 2 blocs */
     .panel {
       background: rgba(20, 20, 24, 0.45);
       border: 1px solid rgba(255, 255, 255, 0.18);
@@ -87,7 +80,7 @@
       padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, 0.18);
-      background: rgba(0, 0, 0, 0.20);
+      background: rgba(0, 0, 0, 0.2);
       white-space: nowrap;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -106,24 +99,13 @@
       width: 100%;
     }
 
-    select {
-      appearance: none;
+    select,
+    input[type="file"] {
       padding: 12px;
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.12);
       background: rgba(0, 0, 0, 0.25);
       color: var(--text);
-      outline: none;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    input[type="file"] {
-      padding: 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(0, 0, 0, 0.25);
-      color: var(--muted);
       outline: none;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -168,18 +150,8 @@
       color: var(--muted);
       font-weight: 700;
       text-transform: none;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
     }
 
-    .hint {
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-
-    /* Canvas bloc aussi en glass */
     .canvasWrap {
       position: relative;
       width: 100%;
@@ -213,8 +185,21 @@
       display: none;
       line-height: 1.35;
       white-space: pre-wrap;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .hint {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .hint strong {
+      color: var(--text);
     }
   </style>
 </head>
@@ -234,11 +219,16 @@
       <input id="photoInput" type="file" accept="image/*" />
 
       <label for="zoomRange">Zoom</label>
-      <input id="zoomRange" type="range" min="0.6" max="2.2" step="0.01" value="1" />
+      <input id="zoomRange" type="range" min="0.8" max="2.5" step="0.01" value="1" />
 
       <div class="row">
         <button id="resetBtn" class="btn secondary" type="button">Recentrer</button>
         <button id="downloadBtn" class="btn" type="button">Télécharger PNG</button>
+      </div>
+
+      <div class="hint">
+        <strong>Réglage équipe par équipe :</strong><br>
+        Modifie <code>cx</code>, <code>cy</code>, <code>r</code> et <code>fitScale</code> dans le tableau <code>FRAMES</code> si un cadre ne remplit pas parfaitement le rond.
       </div>
 
       <div id="errorBox" class="errorBox"></div>
@@ -252,18 +242,85 @@
   <script>
     "use strict";
 
-    // Exemples de cadres (même dossier que index.html)
+    /*
+      IMPORTANT :
+      - cx / cy / r = position réelle du rond à l'intérieur du PNG
+      - fitScale = petit multiplicateur propre à l'équipe
+      - si un cadre laisse une bordure vide, augmente fitScale
+      - si la photo est trop zoomée, baisse fitScale
+    */
+
     const FRAMES = [
-      { id: "b1", name: "Team Dragon", src: "TeamDragon.png", mask: { cx: 512, cy: 512, r: 388 } },
-      { id: "b2", name: "L'ombre de l'élite", src: "L'ombre de l'élite.png", mask: { cx: 512, cy: 512, r: 388 } },
-      { id: "b3", name: "Team Diabloss", src: "Team Diabloss.png", mask: { cx: 512, cy: 512, r: 388 } },
-      { id: "b4", name: "Team Fouuu", src: "Team Fouuu.png", mask: { cx: 512, cy: 512, r: 388 } },
-      { id: "b5", name: "Team Licorne", src: "TeamLicorne.png", mask: { cx: 512, cy: 512, r: 388 } },
-      { id: "b6", name: "Team Phoenix", src: "Team Phoenix.png", mask: { cx: 512, cy: 512, r: 388 } },
-      { id: "b7", name: "Team Panther", src: "team panther.png", mask: { cx: 512, cy: 512, r: 388 } },
-      { id: "b8", name: "Team Apéro", src: "team apéro.png", mask: { cx: 512, cy: 512, r: 388 } },
-      { id: "b9", name: "Team Gorille", src: "team gorille.png", mask: { cx: 512, cy: 512, r: 388 } },
-      { id: "b10", name: "Team Loup", src: "team loup.png", mask: { cx: 512, cy: 512, r: 388 } }
+      {
+        id: "b1",
+        name: "Team Dragon",
+        src: "TeamDragon.png",
+        mask: { cx: 512, cy: 512, r: 388 },
+        fitScale: 1.00
+      },
+      {
+        id: "b2",
+        name: "L'ombre de l'élite",
+        src: "L'ombre de l'élite.png",
+        mask: { cx: 512, cy: 512, r: 388 },
+        fitScale: 1.08
+      },
+      {
+        id: "b3",
+        name: "Team Diabloss",
+        src: "Team Diabloss.png",
+        mask: { cx: 512, cy: 512, r: 388 },
+        fitScale: 1.00
+      },
+      {
+        id: "b4",
+        name: "Team Fouuu",
+        src: "Team Fouuu.png",
+        mask: { cx: 512, cy: 512, r: 388 },
+        fitScale: 1.00
+      },
+      {
+        id: "b5",
+        name: "Team Licorne",
+        src: "TeamLicorne.png",
+        mask: { cx: 512, cy: 512, r: 388 },
+        fitScale: 1.00
+      },
+      {
+        id: "b6",
+        name: "Team Phoenix",
+        src: "Team Phoenix.png",
+        mask: { cx: 512, cy: 512, r: 388 },
+        fitScale: 1.00
+      },
+      {
+        id: "b7",
+        name: "Team Panther",
+        src: "team panther.png",
+        mask: { cx: 512, cy: 512, r: 388 },
+        fitScale: 1.10
+      },
+      {
+        id: "b8",
+        name: "Team Apéro",
+        src: "team apéro.png",
+        mask: { cx: 512, cy: 512, r: 388 },
+        fitScale: 1.10
+      },
+      {
+        id: "b9",
+        name: "Team Gorille",
+        src: "team gorille.png",
+        mask: { cx: 512, cy: 512, r: 388 },
+        fitScale: 1.10
+      },
+      {
+        id: "b10",
+        name: "Team Loup",
+        src: "team loup.png",
+        mask: { cx: 512, cy: 512, r: 388 },
+        fitScale: 1.10
+      }
     ];
 
     const frameSelect = document.getElementById("frameSelect");
@@ -288,9 +345,9 @@
       dragStart: { x: 0, y: 0, ox: 0, oy: 0 }
     };
 
-    function showError(msg) {
+    function showError(message) {
       errorBox.style.display = "block";
-      errorBox.textContent = msg;
+      errorBox.textContent = message;
     }
 
     function clearError() {
@@ -300,24 +357,23 @@
 
     function loadImage(src) {
       return new Promise((resolve, reject) => {
-        const im = new Image();
-        im.onload = () => resolve(im);
-        im.onerror = () => reject(new Error("Impossible de charger : " + src));
-        im.src = encodeURI(src);
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("Impossible de charger : " + src));
+        img.src = encodeURI(src);
       });
     }
 
-    // Chargement image utilisateur via FileReader
     function loadUserFile(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
         reader.onerror = () => reject(new Error("Lecture du fichier impossible."));
         reader.onload = () => {
-          const im = new Image();
-          im.onload = () => resolve(im);
-          im.onerror = () => reject(new Error("Image utilisateur invalide."));
-          im.src = String(reader.result);
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("Image utilisateur invalide."));
+          img.src = String(reader.result);
         };
 
         reader.readAsDataURL(file);
@@ -331,21 +387,49 @@
     function resetPlacement() {
       if (!state.frame || !state.userImg) return;
 
-      const m = state.frame.mask;
-      const d = m.r * 2;
+      const { r } = state.frame.mask;
+      const diameter = r * 2;
 
-      state.baseCoverScale = computeCoverScale(
-        state.userImg.naturalWidth,
-        state.userImg.naturalHeight,
-        d
-      );
+      state.baseCoverScale =
+        computeCoverScale(
+          state.userImg.naturalWidth,
+          state.userImg.naturalHeight,
+          diameter
+        ) * (state.frame.fitScale || 1);
 
       state.zoom = 1;
-      zoomRange.value = "1";
       state.offsetX = 0;
       state.offsetY = 0;
+      zoomRange.value = "1";
 
       draw();
+    }
+
+    function drawPhotoInsideCircle() {
+      if (!state.frame || !state.userImg) return;
+
+      const { cx, cy, r } = state.frame.mask;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+
+      const scale = state.baseCoverScale * state.zoom;
+      const drawW = state.userImg.naturalWidth * scale;
+      const drawH = state.userImg.naturalHeight * scale;
+
+      const x = cx - (drawW / 2) + state.offsetX;
+      const y = cy - (drawH / 2) + state.offsetY;
+
+      ctx.drawImage(state.userImg, x, y, drawW, drawH);
+      ctx.restore();
+    }
+
+    function drawFrame() {
+      if (!state.frameImg) return;
+      ctx.drawImage(state.frameImg, 0, 0, canvas.width, canvas.height);
     }
 
     function draw() {
@@ -353,31 +437,8 @@
 
       if (!state.frame) return;
 
-      // 1) Photo dans le cercle
-      if (state.userImg) {
-        const m = state.frame.mask;
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(m.cx, m.cy, m.r, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.clip();
-
-        const s = state.baseCoverScale * state.zoom;
-        const imgW = state.userImg.naturalWidth * s;
-        const imgH = state.userImg.naturalHeight * s;
-
-        const x = (m.cx - imgW / 2) + state.offsetX;
-        const y = (m.cy - imgH / 2) + state.offsetY;
-
-        ctx.drawImage(state.userImg, x, y, imgW, imgH);
-        ctx.restore();
-      }
-
-      // 2) Cadre par-dessus
-      if (state.frameImg) {
-        ctx.drawImage(state.frameImg, 0, 0, canvas.width, canvas.height);
-      }
+      drawPhotoInsideCircle();
+      drawFrame();
     }
 
     function exportPNG() {
@@ -390,14 +451,14 @@
 
       canvas.toBlob((blob) => {
         if (!blob) {
-          showError("Export impossible (toBlob a renvoyé null).");
+          showError("Export impossible.");
           return;
         }
 
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = (state.frame?.name || "export") + ".png";
+        a.download = (state.frame?.name || "banniere") + ".png";
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -408,59 +469,91 @@
     function populateFrames() {
       frameSelect.innerHTML = "";
 
-      for (const f of FRAMES) {
-        const opt = document.createElement("option");
-        opt.value = f.id;
-        opt.textContent = f.name;
-        frameSelect.appendChild(opt);
+      for (const frame of FRAMES) {
+        const option = document.createElement("option");
+        option.value = frame.id;
+        option.textContent = frame.name;
+        frameSelect.appendChild(option);
       }
     }
 
-    async function setFrameById(id) {
+    async function setFrameById(frameId) {
       clearError();
 
-      const f = FRAMES.find((x) => x.id === id) || FRAMES[0];
-      state.frame = f;
+      const frame = FRAMES.find((item) => item.id === frameId) || FRAMES[0];
+      state.frame = frame;
       state.frameImg = null;
 
       try {
-        state.frameImg = await loadImage(f.src);
+        const img = await loadImage(frame.src);
+        state.frameImg = img;
 
-        if (state.frameImg.naturalWidth && state.frameImg.naturalHeight) {
-          canvas.width = state.frameImg.naturalWidth;
-          canvas.height = state.frameImg.naturalHeight;
+        if (img.naturalWidth && img.naturalHeight) {
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
         }
 
-        if (state.userImg) resetPlacement();
-        draw();
-      } catch (err) {
-        console.error(err);
-        state.frameImg = null;
-        draw();
-
+        if (state.userImg) {
+          resetPlacement();
+        } else {
+          draw();
+        }
+      } catch (error) {
+        console.error(error);
         showError(
-          "Erreur de chargement du cadre : " + f.src + "\n" +
-          "Vérifie le nom exact (majuscules/minuscules, espaces) et qu'il est au même niveau que index.html.\n" +
-          "Astuce : si tu ouvres le fichier en file://, préfère un hébergement (GitHub Pages) ou un serveur local."
+          "Erreur de chargement du cadre : " + frame.src + "\n" +
+          "Vérifie le nom exact du fichier et son emplacement."
         );
       }
     }
 
-    // Events
-    frameSelect.addEventListener("change", () => setFrameById(frameSelect.value));
+    function getCanvasPoint(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
 
-    photoInput.addEventListener("change", async (e) => {
+      return {
+        x: (clientX - rect.left) * (canvas.width / rect.width),
+        y: (clientY - rect.top) * (canvas.height / rect.height)
+      };
+    }
+
+    function startDrag(x, y) {
+      if (!state.userImg || !state.frame) return;
+
+      state.dragging = true;
+      state.dragStart.x = x;
+      state.dragStart.y = y;
+      state.dragStart.ox = state.offsetX;
+      state.dragStart.oy = state.offsetY;
+    }
+
+    function moveDrag(x, y) {
+      if (!state.dragging) return;
+
+      state.offsetX = state.dragStart.ox + (x - state.dragStart.x);
+      state.offsetY = state.dragStart.oy + (y - state.dragStart.y);
+      draw();
+    }
+
+    function stopDrag() {
+      state.dragging = false;
+    }
+
+    frameSelect.addEventListener("change", () => {
+      setFrameById(frameSelect.value);
+    });
+
+    photoInput.addEventListener("change", async (event) => {
       clearError();
 
-      const file = e.target.files && e.target.files[0];
+      const file = event.target.files?.[0];
       if (!file) return;
 
       try {
         state.userImg = await loadUserFile(file);
         resetPlacement();
-      } catch (err) {
-        console.error(err);
-        showError("Impossible de charger cette image utilisateur.");
+      } catch (error) {
+        console.error(error);
+        showError("Impossible de charger cette image.");
       } finally {
         photoInput.value = "";
       }
@@ -471,85 +564,54 @@
       draw();
     });
 
-    resetBtn.addEventListener("click", () => resetPlacement());
-    downloadBtn.addEventListener("click", () => exportPNG());
-
-    // Drag souris
-    canvas.addEventListener("mousedown", (e) => {
-      if (!state.userImg || !state.frame) return;
-
-      state.dragging = true;
-      const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-      const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-      state.dragStart.x = x;
-      state.dragStart.y = y;
-      state.dragStart.ox = state.offsetX;
-      state.dragStart.oy = state.offsetY;
+    resetBtn.addEventListener("click", () => {
+      resetPlacement();
     });
 
-    window.addEventListener("mouseup", () => {
-      state.dragging = false;
+    downloadBtn.addEventListener("click", () => {
+      exportPNG();
     });
 
-    window.addEventListener("mousemove", (e) => {
-      if (!state.dragging) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-      const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-      state.offsetX = state.dragStart.ox + (x - state.dragStart.x);
-      state.offsetY = state.dragStart.oy + (y - state.dragStart.y);
-      draw();
+    canvas.addEventListener("mousedown", (event) => {
+      const p = getCanvasPoint(event.clientX, event.clientY);
+      startDrag(p.x, p.y);
     });
 
-    // Touch mobile
-    canvas.addEventListener("touchstart", (e) => {
-      if (!state.userImg || !state.frame) return;
-      if (e.touches.length !== 1) return;
+    window.addEventListener("mousemove", (event) => {
+      const p = getCanvasPoint(event.clientX, event.clientY);
+      moveDrag(p.x, p.y);
+    });
 
-      e.preventDefault();
+    window.addEventListener("mouseup", stopDrag);
 
-      const rect = canvas.getBoundingClientRect();
-      const t = e.touches[0];
-      const x = (t.clientX - rect.left) * (canvas.width / rect.width);
-      const y = (t.clientY - rect.top) * (canvas.height / rect.height);
+    canvas.addEventListener("touchstart", (event) => {
+      if (event.touches.length !== 1) return;
+      event.preventDefault();
 
-      state.dragging = true;
-      state.dragStart.x = x;
-      state.dragStart.y = y;
-      state.dragStart.ox = state.offsetX;
-      state.dragStart.oy = state.offsetY;
+      const touch = event.touches[0];
+      const p = getCanvasPoint(touch.clientX, touch.clientY);
+      startDrag(p.x, p.y);
     }, { passive: false });
 
-    window.addEventListener("touchend", () => {
-      state.dragging = false;
-    });
+    window.addEventListener("touchmove", (event) => {
+      if (!state.dragging || event.touches.length !== 1) return;
+      event.preventDefault();
 
-    window.addEventListener("touchmove", (e) => {
-      if (!state.dragging) return;
-      if (e.touches.length !== 1) return;
-
-      e.preventDefault();
-
-      const rect = canvas.getBoundingClientRect();
-      const t = e.touches[0];
-      const x = (t.clientX - rect.left) * (canvas.width / rect.width);
-      const y = (t.clientY - rect.top) * (canvas.height / rect.height);
-
-      state.offsetX = state.dragStart.ox + (x - state.dragStart.x);
-      state.offsetY = state.dragStart.oy + (y - state.dragStart.y);
-      draw();
+      const touch = event.touches[0];
+      const p = getCanvasPoint(touch.clientX, touch.clientY);
+      moveDrag(p.x, p.y);
     }, { passive: false });
 
-    // Boot
-    (function boot() {
+    window.addEventListener("touchend", stopDrag);
+
+    function boot() {
       populateFrames();
-      setFrameById(FRAMES[0].id);
-      draw();
-    })();
+      if (FRAMES.length > 0) {
+        setFrameById(FRAMES[0].id);
+      }
+    }
+
+    boot();
   </script>
 </body>
 </html>
