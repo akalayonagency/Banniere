@@ -2,191 +2,217 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Akatsuki Crateur de Bannièrer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Akatsuki Créateur de Bannière</title>
 
   <style>
-    :root{
-      --bg:#050506;
-      --panel: rgba(10,10,12,.72);
-      --stroke: rgba(255,255,255,.08);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.62);
-      --glow: rgba(255,80,0,.22);
-      --glow2: rgba(255,0,0,.16);
-      --btn: rgba(255,110,0,.16);
-      --btn2: rgba(255,110,0,.28);
+    :root {
+      --bg: #050506;
+      --panel: rgba(10, 10, 12, 0.72);
+      --stroke: rgba(255, 255, 255, 0.08);
+      --text: rgba(255, 255, 255, 0.92);
+      --muted: rgba(255, 255, 255, 0.62);
+      --glow: rgba(255, 80, 0, 0.22);
+      --glow2: rgba(255, 0, 0, 0.16);
+      --btn: rgba(255, 110, 0, 0.16);
+      --btn2: rgba(255, 110, 0, 0.28);
     }
-    *{ box-sizing:border-box; }
-    html, body{ height:100%; }
 
-    /* ✅ Fond page transparent pour intégration */
-    body{
-      margin:0;
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    /* Fond page transparent pour intégration */
+    body {
+      margin: 0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
-      background: transparent; /* important */
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
+      color: var(--text);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
     }
 
-    .app{
-      width:min(1120px, 100%);
-      display:grid;
+    .app {
+      width: min(1120px, 100%);
+      display: grid;
       grid-template-columns: 420px 1fr;
-      gap:18px;
-    }
-    @media (max-width: 980px){
-      .app{ grid-template-columns:1fr; }
+      gap: 18px;
     }
 
-    /* ✅ Petit effet glass sur les 2 blocs */
-    .panel{
-      background: rgba(20,20,24,0.45);
-      border: 1px solid rgba(255,255,255,0.18);
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Petit effet glass sur les 2 blocs */
+    .panel {
+      background: rgba(20, 20, 24, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 18px;
-      padding:16px;
+      padding: 16px;
       box-shadow:
-        0 0 0 1px rgba(255,255,255,.04) inset,
-        0 30px 90px rgba(0,0,0,.45);
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 30px 90px rgba(0, 0, 0, 0.45);
       backdrop-filter: blur(18px) saturate(130%);
       -webkit-backdrop-filter: blur(18px) saturate(130%);
     }
 
-    .title{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:12px;
+    .title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
     }
-    .title h1{
-      font-size:16px;
-      margin:0;
-      letter-spacing:.5px;
-      font-weight:800;
-      text-transform:uppercase;
+
+    .title h1 {
+      font-size: 16px;
+      margin: 0;
+      letter-spacing: 0.5px;
+      font-weight: 800;
+      text-transform: uppercase;
     }
-    .badge{
-      font-size:12px;
-      color:var(--muted);
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,0.18);
-      background: rgba(0,0,0,.20);
-      white-space:nowrap;
+
+    .badge {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(0, 0, 0, 0.20);
+      white-space: nowrap;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
 
-    label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin:12px 0 6px;
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 12px 0 6px;
     }
-    select, input[type="file"], input[type="range"]{ width:100%; }
 
-    select{
-      appearance:none;
-      padding:12px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.25);
-      color:var(--text);
-      outline:none;
+    select,
+    input[type="file"],
+    input[type="range"] {
+      width: 100%;
+    }
+
+    select {
+      appearance: none;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--text);
+      outline: none;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
 
-    input[type="file"]{
-      padding:10px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.25);
-      color:var(--muted);
-      outline:none;
+    input[type="file"] {
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--muted);
+      outline: none;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
 
-    .row{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      margin-top:12px;
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
     }
-    .row > *{ flex:1; }
 
-    .btn{
-      cursor:pointer;
-      padding:12px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,180,120,.18);
+    .row > * {
+      flex: 1;
+    }
+
+    .btn {
+      cursor: pointer;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 180, 120, 0.18);
       background: linear-gradient(180deg, var(--btn2), var(--btn));
       color: var(--text);
-      font-weight:800;
-      letter-spacing:.2px;
-      text-transform:uppercase;
-      transition: transform .06s ease, filter .15s ease;
-      user-select:none;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+      transition: transform 0.06s ease, filter 0.15s ease;
+      user-select: none;
     }
-    .btn:hover{ filter:brightness(1.08); }
-    .btn:active{ transform: translateY(1px); }
 
-    .btn.secondary{
-      background: rgba(0,0,0,.25);
-      border:1px solid rgba(255,255,255,.12);
+    .btn:hover {
+      filter: brightness(1.08);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn.secondary {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       color: var(--muted);
-      font-weight:700;
-      text-transform:none;
+      font-weight: 700;
+      text-transform: none;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
 
-    .hint{
-      margin-top:10px;
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.35;
+    .hint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
     }
 
-    /* ✅ Canvas bloc aussi en glass */
-    .canvasWrap{
-      position:relative;
-      width:100%;
-      aspect-ratio:1/1;
+    /* Canvas bloc aussi en glass */
+    .canvasWrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
       border-radius: 18px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,0.18);
-      background: rgba(15,15,18,0.35);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(15, 15, 18, 0.35);
       box-shadow:
-        0 0 0 1px rgba(255,255,255,.04) inset,
-        0 40px 120px rgba(0,0,0,.55);
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 40px 120px rgba(0, 0, 0, 0.55);
       backdrop-filter: blur(22px) saturate(140%);
       -webkit-backdrop-filter: blur(22px) saturate(140%);
     }
 
-    canvas{
-      width:100%;
-      height:100%;
-      display:block;
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
       border-radius: 14px;
     }
 
-    .errorBox{
-      margin-top:12px;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,80,80,.25);
-      background: rgba(120,0,0,.16);
-      color: rgba(255,220,220,.95);
-      font-size:12px;
-      display:none;
-      line-height:1.35;
-      white-space:pre-wrap;
+    .errorBox {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 80, 80, 0.25);
+      background: rgba(120, 0, 0, 0.16);
+      color: rgba(255, 220, 220, 0.95);
+      font-size: 12px;
+      display: none;
+      line-height: 1.35;
+      white-space: pre-wrap;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
@@ -195,7 +221,6 @@
 
 <body>
   <div class="app">
-
     <div class="panel">
       <div class="title">
         <h1>Créateur de Bannière</h1>
@@ -219,35 +244,34 @@
       <div id="errorBox" class="errorBox"></div>
     </div>
 
-    <div class="panel canvasWrap" style="padding:10px;">
+    <div class="panel canvasWrap" style="padding: 10px;">
       <canvas id="preview" width="1024" height="1024"></canvas>
     </div>
-
   </div>
 
   <script>
     "use strict";
 
-    // 8 exemples (même dossier que index.html)
+    // Exemples de cadres (même dossier que index.html)
     const FRAMES = [
-     { id:"b1", name:"Team Dragon", src:"TeamDragon.png", mask:{ cx:512, cy:512, r:388 } },
-     { id:"b2", name:"L'ombre de l'élite", src:"L'ombre de l'élite.png", mask:{ cx:512, cy:512, r:388 } }
-      { id:"b3", name:"Team Diabloss", src:"Team Diabloss.png", mask:{ cx:512, cy:512, r:388 } },
-      { id:"b4", name:"Team Fouuu", src:"Team Fouuu.png", mask:{ cx:512, cy:512, r:388 } },
-      { id:"b5", name:"Team Licorne", src:"TeamLicorne.png", mask:{ cx:512, cy:512, r:388 } },
-      { id:"b6", name:"Team Phoenix", src:"Team Phoenix.png", mask:{ cx:512, cy:512, r:388 } },
-      { id:"b7", name:"Team Panther", src:"team panther.png", mask:{ cx:512, cy:512, r:388 } },
-      { id:"b8", name:"Team Apéro", src:"team apéro.png", mask:{ cx:512, cy:512, r:388 } }
-      { id:"b9", name:"Team Gorille", src:"team gorille.png", mask:{ cx:512, cy:512, r:388 } }
-    { id:"b10", name:"Team Loup", src:"team loup.png", mask:{ cx:512, cy:512, r:388 } }
+      { id: "b1", name: "Team Dragon", src: "TeamDragon.png", mask: { cx: 512, cy: 512, r: 388 } },
+      { id: "b2", name: "L'ombre de l'élite", src: "L'ombre de l'élite.png", mask: { cx: 512, cy: 512, r: 388 } },
+      { id: "b3", name: "Team Diabloss", src: "Team Diabloss.png", mask: { cx: 512, cy: 512, r: 388 } },
+      { id: "b4", name: "Team Fouuu", src: "Team Fouuu.png", mask: { cx: 512, cy: 512, r: 388 } },
+      { id: "b5", name: "Team Licorne", src: "TeamLicorne.png", mask: { cx: 512, cy: 512, r: 388 } },
+      { id: "b6", name: "Team Phoenix", src: "Team Phoenix.png", mask: { cx: 512, cy: 512, r: 388 } },
+      { id: "b7", name: "Team Panther", src: "team panther.png", mask: { cx: 512, cy: 512, r: 388 } },
+      { id: "b8", name: "Team Apéro", src: "team apéro.png", mask: { cx: 512, cy: 512, r: 388 } },
+      { id: "b9", name: "Team Gorille", src: "team gorille.png", mask: { cx: 512, cy: 512, r: 388 } },
+      { id: "b10", name: "Team Loup", src: "team loup.png", mask: { cx: 512, cy: 512, r: 388 } }
     ];
 
     const frameSelect = document.getElementById("frameSelect");
-    const photoInput  = document.getElementById("photoInput");
-    const zoomRange   = document.getElementById("zoomRange");
-    const resetBtn    = document.getElementById("resetBtn");
+    const photoInput = document.getElementById("photoInput");
+    const zoomRange = document.getElementById("zoomRange");
+    const resetBtn = document.getElementById("resetBtn");
     const downloadBtn = document.getElementById("downloadBtn");
-    const errorBox    = document.getElementById("errorBox");
+    const errorBox = document.getElementById("errorBox");
 
     const canvas = document.getElementById("preview");
     const ctx = canvas.getContext("2d", { alpha: true });
@@ -264,31 +288,31 @@
       dragStart: { x: 0, y: 0, ox: 0, oy: 0 }
     };
 
-    function showError(msg){
+    function showError(msg) {
       errorBox.style.display = "block";
       errorBox.textContent = msg;
     }
-    function clearError(){
+
+    function clearError() {
       errorBox.style.display = "none";
       errorBox.textContent = "";
     }
 
-    function loadImage(src){
+    function loadImage(src) {
       return new Promise((resolve, reject) => {
         const im = new Image();
         im.onload = () => resolve(im);
-        im.onerror = () => reject(new Error("Impossible de charger: " + src));
-        // encodeURI => gère mieux les espaces
+        im.onerror = () => reject(new Error("Impossible de charger : " + src));
         im.src = encodeURI(src);
       });
     }
 
-    // ✅ Correction: FileReader (plus fiable que createObjectURL selon navigateurs)
-    function loadUserFile(file){
+    // Chargement image utilisateur via FileReader
+    function loadUserFile(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
-        reader.onerror = () => reject(new Error("Lecture fichier impossible."));
+        reader.onerror = () => reject(new Error("Lecture du fichier impossible."));
         reader.onload = () => {
           const im = new Image();
           im.onload = () => resolve(im);
@@ -300,17 +324,22 @@
       });
     }
 
-    function computeCoverScale(imgW, imgH, diameter){
+    function computeCoverScale(imgW, imgH, diameter) {
       return Math.max(diameter / imgW, diameter / imgH);
     }
 
-    function resetPlacement(){
+    function resetPlacement() {
       if (!state.frame || !state.userImg) return;
 
       const m = state.frame.mask;
       const d = m.r * 2;
 
-      state.baseCoverScale = computeCoverScale(state.userImg.naturalWidth, state.userImg.naturalHeight, d);
+      state.baseCoverScale = computeCoverScale(
+        state.userImg.naturalWidth,
+        state.userImg.naturalHeight,
+        d
+      );
+
       state.zoom = 1;
       zoomRange.value = "1";
       state.offsetX = 0;
@@ -319,13 +348,13 @@
       draw();
     }
 
-    function draw(){
-      ctx.clearRect(0,0,canvas.width,canvas.height);
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (!state.frame) return;
 
       // 1) Photo dans le cercle
-      if (state.userImg){
+      if (state.userImg) {
         const m = state.frame.mask;
 
         ctx.save();
@@ -338,31 +367,33 @@
         const imgW = state.userImg.naturalWidth * s;
         const imgH = state.userImg.naturalHeight * s;
 
-        const x = (m.cx - imgW/2) + state.offsetX;
-        const y = (m.cy - imgH/2) + state.offsetY;
+        const x = (m.cx - imgW / 2) + state.offsetX;
+        const y = (m.cy - imgH / 2) + state.offsetY;
 
         ctx.drawImage(state.userImg, x, y, imgW, imgH);
         ctx.restore();
       }
 
       // 2) Cadre par-dessus
-      if (state.frameImg){
+      if (state.frameImg) {
         ctx.drawImage(state.frameImg, 0, 0, canvas.width, canvas.height);
       }
     }
 
-    function exportPNG(){
+    function exportPNG() {
       clearError();
-      if (!state.userImg){
+
+      if (!state.userImg) {
         showError("Importe une photo avant de télécharger.");
         return;
       }
 
       canvas.toBlob((blob) => {
-        if (!blob){
+        if (!blob) {
           showError("Export impossible (toBlob a renvoyé null).");
           return;
         }
+
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -374,9 +405,10 @@
       }, "image/png");
     }
 
-    function populateFrames(){
+    function populateFrames() {
       frameSelect.innerHTML = "";
-      for (const f of FRAMES){
+
+      for (const f of FRAMES) {
         const opt = document.createElement("option");
         opt.value = f.id;
         opt.textContent = f.name;
@@ -384,32 +416,32 @@
       }
     }
 
-    async function setFrameById(id){
+    async function setFrameById(id) {
       clearError();
 
-      const f = FRAMES.find(x => x.id === id) || FRAMES[0];
+      const f = FRAMES.find((x) => x.id === id) || FRAMES[0];
       state.frame = f;
       state.frameImg = null;
 
-      try{
+      try {
         state.frameImg = await loadImage(f.src);
 
-        // Option: si le cadre n'est pas 1024, adapte le canvas
-        if (state.frameImg.naturalWidth && state.frameImg.naturalHeight){
+        if (state.frameImg.naturalWidth && state.frameImg.naturalHeight) {
           canvas.width = state.frameImg.naturalWidth;
           canvas.height = state.frameImg.naturalHeight;
         }
 
         if (state.userImg) resetPlacement();
         draw();
-      }catch(err){
+      } catch (err) {
         console.error(err);
         state.frameImg = null;
         draw();
+
         showError(
-          "Erreur chargement du cadre : " + f.src + "\n" +
-          "Vérifie le nom exact (casse/espaces) et qu'il est au même niveau que index.html.\n" +
-          "Astuce: si tu ouvres en file://, préfère un hébergement (GitHub Pages) ou un serveur local."
+          "Erreur de chargement du cadre : " + f.src + "\n" +
+          "Vérifie le nom exact (majuscules/minuscules, espaces) et qu'il est au même niveau que index.html.\n" +
+          "Astuce : si tu ouvres le fichier en file://, préfère un hébergement (GitHub Pages) ou un serveur local."
         );
       }
     }
@@ -423,13 +455,13 @@
       const file = e.target.files && e.target.files[0];
       if (!file) return;
 
-      try{
+      try {
         state.userImg = await loadUserFile(file);
-        resetPlacement(); // calcule cover + draw
-      }catch(err){
+        resetPlacement();
+      } catch (err) {
         console.error(err);
         showError("Impossible de charger cette image utilisateur.");
-      }finally{
+      } finally {
         photoInput.value = "";
       }
     });
@@ -442,14 +474,14 @@
     resetBtn.addEventListener("click", () => resetPlacement());
     downloadBtn.addEventListener("click", () => exportPNG());
 
-    // Drag souris (reposition)
+    // Drag souris
     canvas.addEventListener("mousedown", (e) => {
       if (!state.userImg || !state.frame) return;
 
       state.dragging = true;
       const rect = canvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-      const y = (e.clientY - rect.top)  * (canvas.height / rect.height);
+      const y = (e.clientY - rect.top) * (canvas.height / rect.height);
 
       state.dragStart.x = x;
       state.dragStart.y = y;
@@ -457,57 +489,63 @@
       state.dragStart.oy = state.offsetY;
     });
 
-    window.addEventListener("mouseup", () => { state.dragging = false; });
+    window.addEventListener("mouseup", () => {
+      state.dragging = false;
+    });
 
     window.addEventListener("mousemove", (e) => {
       if (!state.dragging) return;
 
       const rect = canvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-      const y = (e.clientY - rect.top)  * (canvas.height / rect.height);
+      const y = (e.clientY - rect.top) * (canvas.height / rect.height);
 
       state.offsetX = state.dragStart.ox + (x - state.dragStart.x);
       state.offsetY = state.dragStart.oy + (y - state.dragStart.y);
       draw();
     });
 
-    // Touch (mobile)
+    // Touch mobile
     canvas.addEventListener("touchstart", (e) => {
       if (!state.userImg || !state.frame) return;
       if (e.touches.length !== 1) return;
+
       e.preventDefault();
 
       const rect = canvas.getBoundingClientRect();
       const t = e.touches[0];
       const x = (t.clientX - rect.left) * (canvas.width / rect.width);
-      const y = (t.clientY - rect.top)  * (canvas.height / rect.height);
+      const y = (t.clientY - rect.top) * (canvas.height / rect.height);
 
       state.dragging = true;
       state.dragStart.x = x;
       state.dragStart.y = y;
       state.dragStart.ox = state.offsetX;
       state.dragStart.oy = state.offsetY;
-    }, { passive:false });
+    }, { passive: false });
 
-    window.addEventListener("touchend", () => { state.dragging = false; });
+    window.addEventListener("touchend", () => {
+      state.dragging = false;
+    });
 
     window.addEventListener("touchmove", (e) => {
       if (!state.dragging) return;
       if (e.touches.length !== 1) return;
+
       e.preventDefault();
 
       const rect = canvas.getBoundingClientRect();
       const t = e.touches[0];
       const x = (t.clientX - rect.left) * (canvas.width / rect.width);
-      const y = (t.clientY - rect.top)  * (canvas.height / rect.height);
+      const y = (t.clientY - rect.top) * (canvas.height / rect.height);
 
       state.offsetX = state.dragStart.ox + (x - state.dragStart.x);
       state.offsetY = state.dragStart.oy + (y - state.dragStart.y);
       draw();
-    }, { passive:false });
+    }, { passive: false });
 
     // Boot
-    (function boot(){
+    (function boot() {
       populateFrames();
       setFrameById(FRAMES[0].id);
       draw();
